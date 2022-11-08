@@ -1,0 +1,80 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserModel {
+  id    Int     @id @default(autoincrement())
+  chat_id Int  @unique
+  username  String
+  authorized Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  buyOrders BuyOrderModel[]
+  sellOrders SellOrderModel[]
+  bindSellOrders BindSellOrderModel[]
+  bindBuyOrders BindBuyOrderModel[]
+}
+
+model BuyOrderModel {
+  id       Int  @id @default(autoincrement())
+  buyCurrency String
+  sellCurrency String
+  count Float
+  price Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner   UserModel @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  isOpen Boolean @default(true)
+  isExecuted Boolean @default(false)
+  bindSellOrders BindSellOrderModel[]
+}
+
+model BindSellOrderModel {
+  id       Int  @id @default(autoincrement())
+  bindOrder   BuyOrderModel @relation(fields: [bindOrderId], references: [id])
+  bindOrderId Int
+  count Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner   UserModel @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  isOpen Boolean @default(true)
+  isExecuted Boolean @default(false)
+}
+
+model SellOrderModel {
+  id       Int  @id @default(autoincrement())
+  sellCurrency String
+  buyCurrency String
+  count Float
+  price Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner   UserModel @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  isOpen Boolean @default(true)
+  isExecuted Boolean @default(false)
+  bindBuyOrders BindBuyOrderModel[]
+}
+
+model BindBuyOrderModel {
+  id       Int  @id @default(autoincrement())
+  bindOrder   SellOrderModel @relation(fields: [bindOrderId], references: [id])
+  bindOrderId Int
+  count Float
+  owner   UserModel @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  isOpen Boolean @default(true)
+  isExecuted Boolean @default(false)
+}
+

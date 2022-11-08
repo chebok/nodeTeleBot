@@ -1,16 +1,27 @@
 {
   "name": "nodetelebot",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node ./dist/main.js",
+    "dev": "nodemon",
+    "generate": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-notifier": "^10.0.1"
+    "@prisma/client": "^4.5.0",
+    "dotenv": "^16.0.3",
+    "node-notifier": "^10.0.1",
+    "tslog": "^3.3.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "prisma": "^4.5.0",
+    "ts-node": "^10.9.1"
   }
 }
