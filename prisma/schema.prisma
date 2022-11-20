@@ -11,70 +11,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserModel {
+enum Status {
+  OPEN
+  CLOSE
+  EXECUTED
+}
+
+enum OrderType {
+  SELL
+  BUY
+}
+
+enum PriceType {
+  MANUAL
+  MARKET
+}
+
+model User {
   id    Int     @id @default(autoincrement())
   chat_id Int  @unique
   username  String
   authorized Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  buyOrders BuyOrderModel[]
-  sellOrders SellOrderModel[]
-  bindSellOrders BindSellOrderModel[]
-  bindBuyOrders BindBuyOrderModel[]
+  orders Order[]
+  redemptionOrder RedemptionOrder[]
 }
 
-model BuyOrderModel {
+model Currency {
+  id    Int     @id @default(autoincrement())
+  title String  @unique
+  sell Order[] @relation("Sell")
+  buy Order[] @relation("Buy")
+}
+
+model Order {
   id       Int  @id @default(autoincrement())
-  buyCurrency String
-  sellCurrency String
+  orderType OrderType
+  sellCurrency Currency @relation("Sell",fields: [sellCurrencyId], references: [id])
+  sellCurrencyId Int 
+  buyCurrency Currency @relation("Buy", fields: [buyCurrencyId], references: [id])
+  buyCurrencyId Int 
   count Float
   price Float
+  priceType PriceType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  owner   UserModel @relation(fields: [ownerId], references: [id])
+  owner   User @relation(fields: [ownerId], references: [id])
   ownerId Int
-  isOpen Boolean @default(true)
-  isExecuted Boolean @default(false)
-  bindSellOrders BindSellOrderModel[]
+  status Status
+  redemptionOrders RedemptionOrder[]
 }
 
-model BindSellOrderModel {
+model RedemptionOrder {
   id       Int  @id @default(autoincrement())
-  bindOrder   BuyOrderModel @relation(fields: [bindOrderId], references: [id])
-  bindOrderId Int
+  parentOrder   Order @relation(fields: [parentOrderId], references: [id])
+  parentOrderId Int
   count Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  owner   UserModel @relation(fields: [ownerId], references: [id])
+  owner   User @relation(fields: [ownerId], references: [id])
   ownerId Int
-  isOpen Boolean @default(true)
-  isExecuted Boolean @default(false)
+  orderType OrderType
+  status Status
 }
-
-model SellOrderModel {
-  id       Int  @id @default(autoincrement())
-  sellCurrency String
-  buyCurrency String
-  count Float
-  price Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  owner   UserModel @relation(fields: [ownerId], references: [id])
-  ownerId Int
-  isOpen Boolean @default(true)
-  isExecuted Boolean @default(false)
-  bindBuyOrders BindBuyOrderModel[]
-}
-
-model BindBuyOrderModel {
-  id       Int  @id @default(autoincrement())
-  bindOrder   SellOrderModel @relation(fields: [bindOrderId], references: [id])
-  bindOrderId Int
-  count Float
-  owner   UserModel @relation(fields: [ownerId], references: [id])
-  ownerId Int
-  isOpen Boolean @default(true)
-  isExecuted Boolean @default(false)
-}
-

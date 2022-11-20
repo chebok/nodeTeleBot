@@ -1,9 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 
-async function main(): Promise<void> {
-  const client = new PrismaClient();
-  await client.$connect();
-  console.log('[PrismaService] Успешно подключились к базе данных');
+class App {
+  async init() {
+    const client = new PrismaClient();
+    await client.$connect();
+    console.log('[PrismaService] Успешно подключились к базе данных');
+    await client.order.create({data: {
+      orderType: ''
+    }})
+  }
 }
 
-main();
+
+const app = new App();
+app.init();
