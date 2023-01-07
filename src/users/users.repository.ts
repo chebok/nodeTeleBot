@@ -9,13 +9,13 @@ import { IUsersRepository } from './users.repository.interface';
 export class UsersRepository implements IUsersRepository {
   constructor(@inject(TYPES.PrismaService) private prismaService: PrismaService) {}
 
-  async authorize(chatId: number): Promise<User> {
+  async authorize(userId: number, authStatus: boolean): Promise<User> {
     return this.prismaService.client.user.update({
       where: {
-        chat_id: chatId,
+        id: userId,
       },
       data: {
-        authorized: true,
+        authorized: authStatus,
       },
     });
   }
@@ -34,6 +34,10 @@ export class UsersRepository implements IUsersRepository {
         chat_id: chatId,
       },
     });
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.prismaService.client.user.findMany();
   }
 
   async findOrCreate({ chatId, username }: UserTelegramDto): Promise<User> {

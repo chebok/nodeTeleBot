@@ -48,10 +48,10 @@ model Currency {
 model Order {
   id       Int  @id @default(autoincrement())
   orderType OrderType
-  sellCurrency Currency @relation("Sell",fields: [sellCurrencyId], references: [id])
-  sellCurrencyId Int 
-  buyCurrency Currency @relation("Buy", fields: [buyCurrencyId], references: [id])
-  buyCurrencyId Int 
+  fiatCurrency Currency @relation("Sell",fields: [fiatCurrencyId], references: [id])
+  fiatCurrencyId Int 
+  cryptoCurrency Currency @relation("Buy", fields: [cryptoCurrencyId], references: [id])
+  cryptoCurrencyId Int 
   count Float
   price Float
   priceType PriceType
@@ -60,6 +60,7 @@ model Order {
   owner   User @relation(fields: [ownerId], references: [id])
   ownerId Int
   status Status
+  consumer  String @default("noname")
   redemptionOrders RedemptionOrder[]
 }
 

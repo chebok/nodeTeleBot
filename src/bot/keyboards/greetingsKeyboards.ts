@@ -1,7 +1,10 @@
 import { Markup } from 'telegraf';
 
 export const greetingKeyboards = {
-  default: Markup.keyboard([['Разместить заявку'], ['Смотреть все заявки']])
+  admin: Markup.keyboard([
+    ['Разместить заявку', 'Смотреть заявки'],
+    ['Пользователи', 'Личный Кабинет'],
+  ])
     .oneTime()
     .resize(),
 };

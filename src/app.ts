@@ -12,7 +12,7 @@ export class App {
     @inject(TYPES.Bot) private bot: Bot,
     @inject(TYPES.ILogger) private logger: ILogger,
     @inject(TYPES.PrismaService) private prismaService: PrismaService,
-  ) { }
+  ) {}
 
 
   public async init() {

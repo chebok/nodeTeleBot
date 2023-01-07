@@ -8,11 +8,14 @@ import { IUsersService } from './users.service.interface';
 @injectable()
 export class UsersService implements IUsersService {
   constructor(@inject(TYPES.IUsersRepository) private usersRepository: IUsersRepository) {}
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.findAll();
+  }
 
   async findOrCreateUser(dto: UserTelegramDto): Promise<User> {
     return await this.usersRepository.findOrCreate(dto);
   }
-  async authorizeUser(dto: UserTelegramDto): Promise<User> {
-    return this.usersRepository.authorize(dto.chatId);
+  async authorizeUser(userId: number, authStatus: boolean): Promise<User> {
+    return this.usersRepository.authorize(userId, authStatus);
   }
 }
