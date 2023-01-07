@@ -59,7 +59,6 @@ export class Bot {
       const chatId = ctx.message.chat.id;
       const user = await this.usersService.findOrCreateUser({ chatId, username });
       ctx.session.user = user;
-      console.log(ctx.session);
       ctx.reply(`Добро пожаловать на биржу ${user.username}`, greetingKeyboards.admin);
     });
   }

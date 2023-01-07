@@ -1,4 +1,4 @@
-import { Currency, Order } from '@prisma/client';
+import { Currency, Order, User } from '@prisma/client';
 import { validate, ValidationError } from 'class-validator';
 import { inject, injectable } from 'inversify';
 import { CurrencyRepository } from '../currency/currency.repository';
@@ -24,12 +24,13 @@ export class OrderService implements IOrderService {
 
   async createOrder(dto: CreateOrderDto): Promise<Order | ValidationError[]> {
     const { orderType, fiatCurrency, cryptoCurrency, count, price, priceType, chatId } = dto;
-    const errors = await validate(dto);
+    const validateTarget = new CreateOrderDto();
+    Object.assign(validateTarget, dto);
+    const errors = await validate(validateTarget);
     if (errors.length > 0) {
-      errors;
+      return errors;
     }
-    const user = await this.usersRepository.find(chatId);
-    if (!user) throw new Error('Такого юзера нет в базе');
+    const user = (await this.usersRepository.find(chatId)) as User;
     const { id: ownerId } = user;
     const { id: fiatCurrencyId } = (await this.currencyRepository.findByTitle(
       fiatCurrency,

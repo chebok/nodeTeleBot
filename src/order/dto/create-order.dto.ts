@@ -6,16 +6,16 @@ export class CreateOrderDto {
   @IsEnum(OrderType)
   orderType: OrderType;
 
-  @IsEnum(ValidCurrency)
+  @IsEnum(ValidCurrency, { message: 'Такой фиатной валюты нет' })
   fiatCurrency: ValidCurrency;
 
-  @IsEnum(ValidCurrency)
+  @IsEnum(ValidCurrency, { message: 'Такой криптовалюты нет' })
   cryptoCurrency: ValidCurrency;
 
-  @IsNumber({ allowNaN: false })
+  @IsNumber({ allowNaN: false }, { message: 'Количество должно быть числом' })
   count: number;
 
-  @IsNumber({ allowNaN: false })
+  @IsNumber({ allowNaN: false }, { message: 'Прайс должен быть числом' })
   price: number;
 
   @IsEnum(PriceType)

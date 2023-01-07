@@ -1,5 +1,6 @@
 import { OrderType, PriceType } from '@prisma/client';
 import axios from 'axios';
+import { ValidationError } from 'class-validator';
 import { inject, injectable } from 'inversify';
 import { Markup, Composer, Scenes } from 'telegraf';
 import { IOrderService } from '../../order/order.service.interface';
@@ -10,6 +11,16 @@ import { orderKeyboards } from '../keyboards/orderKeyboards';
 @injectable()
 export class MakeOrderScene {
   constructor(@inject(TYPES.IOrderService) private orderService: IOrderService) {}
+
+  refactorValidate(errors: ValidationError[]): string {
+    const result: string[] = [];
+    errors.forEach((err) => {
+      if (err.constraints) {
+        result.push(...Object.values(err.constraints));
+      }
+    });
+    return result.toString();
+  }
 
   async getMarketRate(cryptoCur: string, fiatCur: string): Promise<number> {
     const res = await axios.get(
@@ -128,7 +139,7 @@ export class MakeOrderScene {
         const { orderType, cryptoCurrency, count, fiatCurrency, price, priceType } =
           ctx.scene.session.data;
         try {
-          const order = await this.orderService.createOrder({
+          const orderOrErrors = await this.orderService.createOrder({
             orderType,
             cryptoCurrency,
             count: Number(count),
@@ -137,12 +148,11 @@ export class MakeOrderScene {
             priceType,
             chatId,
           });
-          const textMessage = Array.isArray(order)
-            ? order.toString()
-            : `Заявка успешно оформлена id${order.id}`;
+          const textMessage = Array.isArray(orderOrErrors)
+            ? this.refactorValidate(orderOrErrors)
+            : `Заявка успешно оформлена id${orderOrErrors.id}`;
           await ctx.replyWithHTML(textMessage);
         } catch (error) {
-          console.log(error);
           await ctx.replyWithHTML(
             'Произошла ошибка при создании заявки. Обратитесь к администратору',
           );
