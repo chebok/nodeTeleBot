@@ -19,7 +19,7 @@ export class MakeOrderScene {
         result.push(...Object.values(err.constraints));
       }
     });
-    return result.toString();
+    return `При создании заявки произошла ошибка\n${result.toString()}`;
   }
 
   async getMarketRate(cryptoCur: string, fiatCur: string): Promise<number> {
