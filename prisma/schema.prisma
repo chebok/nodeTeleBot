@@ -1,0 +1,78 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  OPEN
+  CLOSE
+  EXECUTED
+}
+
+enum OrderType {
+  SELL
+  BUY
+}
+
+enum PriceType {
+  MANUAL
+  MARKET
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  chat_id Int  @unique
+  username  String
+  authorized Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders Order[]
+  redemptionOrder RedemptionOrder[]
+}
+
+model Currency {
+  id    Int     @id @default(autoincrement())
+  title String  @unique
+  sell Order[] @relation("Sell")
+  buy Order[] @relation("Buy")
+}
+
+model Order {
+  id       Int  @id @default(autoincrement())
+  orderType OrderType
+  fiatCurrency Currency @relation("Sell",fields: [fiatCurrencyId], references: [id])
+  fiatCurrencyId Int 
+  cryptoCurrency Currency @relation("Buy", fields: [cryptoCurrencyId], references: [id])
+  cryptoCurrencyId Int 
+  count Float
+  price Float
+  priceType PriceType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  status Status
+  consumer  String @default("noname")
+  redemptionOrders RedemptionOrder[]
+}
+
+model RedemptionOrder {
+  id       Int  @id @default(autoincrement())
+  parentOrder   Order @relation(fields: [parentOrderId], references: [id])
+  parentOrderId Int
+  count Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+  orderType OrderType
+  status Status
+}
